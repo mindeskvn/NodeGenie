@@ -143,4 +143,4 @@ NodeGenie/
 
 ## 📜 License
 
-MIT © NodeGenie
+MIT © [MINDESK - AUTOMATION SOLUTIONS](https://github.com/mindeskvn)
