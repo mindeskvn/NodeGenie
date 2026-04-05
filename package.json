@@ -1,0 +1,124 @@
+{
+  "name": "nodegenie",
+  "displayName": "NodeGenie",
+  "description": "Read, write and visualize .nde mind-map files for AI agents",
+  "version": "1.5.0",
+  "publisher": "nodegenie",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodegenie/nodegenie"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "nodegenie.mindMapEditor",
+        "displayName": "NodeGenie Mind Map",
+        "selector": [
+          {
+            "filenamePattern": "*.nde"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "languages": [
+      {
+        "id": "nde",
+        "aliases": [
+          "NodeGenie",
+          "nde"
+        ],
+        "extensions": [
+          ".nde"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "nde",
+        "scopeName": "source.nde",
+        "path": "./syntaxes/nde.tmLanguage.json"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "nodegenie.treeView",
+          "name": "NodeGenie Explorer",
+          "when": "resourceExtname == .nde"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "nodegenie.openMindMap",
+        "title": "NodeGenie: Open Mind Map"
+      },
+      {
+        "command": "nodegenie.exportJson",
+        "title": "NodeGenie: Export JSON for AI"
+      },
+      {
+        "command": "nodegenie.refreshTree",
+        "title": "NodeGenie: Refresh Tree",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "nodegenie.openMindMap",
+          "when": "resourceExtname == .nde",
+          "group": "navigation"
+        },
+        {
+          "command": "nodegenie.exportJson",
+          "when": "resourceExtname == .nde",
+          "group": "navigation"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "nodegenie.refreshTree",
+          "when": "view == nodegenie.treeView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "NodeGenie",
+      "properties": {
+        "nodegenie.autoShowMindMap": {
+          "type": "boolean",
+          "default": false,
+          "description": "Auto-open Mind Map when opening .nde file"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.7.1",
+    "typescript": "^5.3.0"
+  }
+}

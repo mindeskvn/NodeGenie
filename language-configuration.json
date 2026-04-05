@@ -1,0 +1,13 @@
+{
+  "comments": {
+    "lineComment": "#"
+  },
+  "brackets": [["[", "]"]],
+  "autoClosingPairs": [
+    { "open": "[", "close": "]" }
+  ],
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*(NODE|META|LINK).*$",
+    "decreaseIndentPattern": "^\\s*$"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "scopeName": "source.nde",
+  "fileTypes": ["nde"],
+  "name": "NDE",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#keyword" },
+    { "include": "#value" }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.nde",
+      "match": "^#.*$"
+    },
+    "keyword": {
+      "name": "keyword.control.nde",
+      "match": "^\\s*(NODE|FUNC|VAR|META|LINK|DESC|FILE|DEPS|CALLS|READS|WRITES|EMITS|WARN|NOTE|TAG|TYPE|RETURN)\\b"
+    },
+    "value": {
+      "name": "string.unquoted.nde",
+      "match": "(?<=\\s{1,99}(NODE|META|LINK|DESC|FILE|DEPS|WARN|NOTE|TAG|TYPE)\\s).*$"
+    }
+  }
+}

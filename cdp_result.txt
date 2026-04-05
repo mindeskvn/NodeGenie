@@ -1,0 +1,21 @@
+﻿[1] EXPR: typeof document !== 'undefined' ? 'DOM_OK' : 'NO_DOM'
+RESULT: {"id":1,"result":{"result":{"type":"string","value":"DOM_OK"}}}
+---
+[2] EXPR: document.querySelectorAll('svg *').length
+RESULT: {"id":2,"result":{"result":{"type":"number","value":0,"description":"0"}}}
+---
+[3] EXPR: document.getElementById('svg') ? document.getElementById('svg').childNodes.length + ' children' : 'NO_SVG'
+RESULT: {"id":3,"result":{"result":{"type":"string","value":"NO_SVG"}}}
+---
+[4] EXPR: document.getElementById('gn') ? document.getElementById('gn').children.length + ' node-elements' : 'NO_GN'
+RESULT: {"id":4,"result":{"result":{"type":"string","value":"NO_GN"}}}
+---
+[5] EXPR: document.body ? document.body.style.background + ' / H=' + document.body.clientHeight : 'NO_BODY'
+RESULT: {"id":5,"result":{"result":{"type":"string","value":" / H=1291"}}}
+---
+[6] EXPR: typeof nodes !== 'undefined' ? 'nodes=' + nodes.length : 'JS_NOT_RUN'
+RESULT: {"id":6,"result":{"result":{"type":"string","value":"JS_NOT_RUN"}}}
+---
+[7] EXPR: typeof nEls !== 'undefined' ? 'nEls=' + nEls.length : 'nEls_UNDEFINED'
+RESULT: {"id":7,"result":{"result":{"type":"string","value":"nEls_UNDEFINED"}}}
+---

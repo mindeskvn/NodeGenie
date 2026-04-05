@@ -1,0 +1,153 @@
+# NodeGenie Sample — Hệ thống xác thực người dùng
+# File này mô tả cấu trúc và kết nối trong ứng dụng
+# Mọi dữ liệu đều là thông tin thuần, không cú pháp đặc biệt
+
+META
+  name HeThongXacThuc
+  version 1.0.0
+  author dev
+  desc Mô tả toàn bộ luồng xác thực người dùng
+
+# ─── Các module chính ───────────────────────────────
+
+NODE AppRoot
+  DESC Điểm vào ứng dụng, khởi tạo tất cả module
+  FILE src/index.ts
+  DEPS AuthModule DatabaseModule LogService
+
+  NODE AuthModule
+    DESC Xử lý xác thực và phân quyền người dùng
+    FILE src/auth/index.ts
+    DEPS DatabaseModule TokenService LogService
+
+    FUNC login
+      DESC Đăng nhập người dùng bằng email và mật khẩu
+      FILE src/auth/login.ts
+      CALLS validateInput hashPassword DatabaseModule.findUser TokenService.generate LogService.info
+      READS userInput
+      WRITES currentSession accessToken
+      RETURN AuthResult
+      WARN Thay đổi hàm này ảnh hưởng toàn bộ luồng đăng nhập
+      NOTE Mật khẩu được hash trước khi so sánh với database
+
+    FUNC logout
+      DESC Hủy phiên đăng nhập hiện tại
+      FILE src/auth/logout.ts
+      CALLS TokenService.revoke LogService.info
+      READS currentSession
+      WRITES currentSession accessToken
+      RETURN void
+
+    FUNC validateInput
+      DESC Kiểm tra định dạng email và độ dài mật khẩu
+      FILE src/auth/validators.ts
+      READS userInput
+      RETURN boolean
+      NOTE Hàm thuần, không có side effect
+
+    VAR currentSession
+      DESC Lưu thông tin phiên đăng nhập hiện tại
+      FILE src/auth/state.ts
+      TYPE object
+      NOTE Được reset về null khi logout
+
+    VAR accessToken
+      DESC JWT token cho phiên hiện tại
+      FILE src/auth/state.ts
+      TYPE string
+      WARN Token hết hạn sau 24 giờ cần refresh
+
+  NODE TokenService
+    DESC Tạo, xác thực và thu hồi JWT token
+    FILE src/auth/token.ts
+
+    FUNC generate
+      DESC Tạo JWT token mới từ thông tin người dùng
+      FILE src/auth/token.ts
+      READS jwtSecret
+      WRITES tokenCache
+      RETURN string
+      NOTE Dùng RS256, secret lấy từ biến môi trường
+
+    FUNC verify
+      DESC Xác thực token và trả về payload
+      FILE src/auth/token.ts
+      CALLS LogService.warn
+      READS jwtSecret tokenCache
+      RETURN UserPayload
+      WARN Token hết hạn hoặc bị thu hồi trả về null
+
+    FUNC revoke
+      DESC Thu hồi token, thêm vào blacklist
+      FILE src/auth/token.ts
+      WRITES tokenBlacklist tokenCache
+      RETURN void
+
+    VAR tokenCache
+      DESC Cache token hợp lệ trong memory (TTL 5 phút)
+      FILE src/auth/token.ts
+      TYPE Map
+
+    VAR tokenBlacklist
+      DESC Danh sách token đã bị thu hồi
+      FILE src/auth/token.ts
+      TYPE Set
+      NOTE Xóa tự động sau khi token hết hạn
+
+    VAR jwtSecret
+      DESC Khóa bí mật để ký JWT
+      FILE src/auth/token.ts
+      TYPE string
+      WARN Không được hardcode, chỉ đọc từ process.env.JWT_SECRET
+
+  NODE DatabaseModule
+    DESC Kết nối và truy vấn cơ sở dữ liệu
+    FILE src/db/index.ts
+    NOTE Dùng connection pool, tối đa 10 connections đồng thời
+
+    FUNC findUser
+      DESC Tìm người dùng theo email
+      FILE src/db/userRepository.ts
+      CALLS db.query
+      READS dbConnection
+      RETURN User
+      WARN Trả về null nếu không tìm thấy, không throw error
+
+    FUNC hashPassword
+      DESC Hash mật khẩu dùng bcrypt với salt rounds = 12
+      FILE src/db/userRepository.ts
+      RETURN string
+      NOTE Thuần túy, không phụ thuộc database
+
+    VAR dbConnection
+      DESC Pool kết nối PostgreSQL
+      FILE src/db/connection.ts
+      TYPE Pool
+      WARN Không tạo connection mới ngoài module này
+
+  NODE LogService
+    DESC Ghi log ra console và file
+    FILE src/logger.ts
+
+    FUNC info
+      DESC Ghi log thông tin bình thường
+      CALLS writeToFile writeToConsole
+      RETURN void
+
+    FUNC warn
+      DESC Ghi log cảnh báo
+      CALLS writeToFile writeToConsole
+      EMITS log.warning
+      RETURN void
+
+# ─── Kết nối mạng lưới ────────────────────────────
+
+LINK AuthModule DatabaseModule sử dụng
+LINK AuthModule TokenService phụ thuộc
+LINK AuthModule LogService ghi log
+LINK login validateInput gọi
+LINK login hashPassword gọi
+LINK login TokenService.generate gọi
+LINK logout TokenService.revoke gọi
+LINK TokenService.verify tokenBlacklist kiểm tra
+LINK DatabaseModule.findUser dbConnection dùng pool
