@@ -1,4 +1,4 @@
-# NodeGenie Extension — v1.0.0
+# NodeGenie Extension — v1.5.0
 
 Extension VS Code để đọc, hiển thị và trực quan hóa file `.nde`.
 
